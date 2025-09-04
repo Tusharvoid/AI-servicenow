@@ -146,54 +146,7 @@ def main():
         initial_sidebar_state="expanded"
     )
 
-    # Custom CSS for beautiful styling
-    st.markdown("""
-    <style>
-        .main > div {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        .stApp > header {
-            background-color: transparent;
-        }
-        .ticket-container {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 10px 0;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-left: 5px solid #667eea;
-        }
-        .chat-message {
-            padding: 10px 15px;
-            border-radius: 10px;
-            margin: 5px 0;
-            max-width: 80%;
-        }
-        .user-message {
-            background-color: #e3f2fd;
-            margin-left: auto;
-            border-bottom-right-radius: 5px;
-        }
-        .assistant-message {
-            background-color: #f5f5f5;
-            margin-right: auto;
-            border-bottom-left-radius: 5px;
-        }
-        .admin-message {
-            background-color: #fff3e0;
-            margin-right: auto;
-            border-bottom-left-radius: 5px;
-            border-left: 3px solid #ff9800;
-        }
-        .status-open { color: #4caf50; font-weight: bold; }
-        .status-in-progress { color: #ff9800; font-weight: bold; }
-        .status-closed { color: #f44336; font-weight: bold; }
-        .priority-high { color: #f44336; font-weight: bold; }
-        .priority-medium { color: #ff9800; font-weight: bold; }
-        .priority-low { color: #4caf50; font-weight: bold; }
-    </style>
-    """, unsafe_allow_html=True)
+    # ...existing code...
 
     # Check API connection
     if not test_api_connection():
