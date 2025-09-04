@@ -1,0 +1,12 @@
+# Add to .gitignore if using git
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+.env
+.venv/
+venv/
+.streamlit/secrets.toml
+*.log
