@@ -1,12 +1,3 @@
-
-[server]
-enableCORS = false
-enableXsrfProtection = false
-
-[browser]
-gatherUsageStats = false
-# Streamlit Configuration for Cloud Deployment
-
 [server]
 enableCORS = false
 enableXsrfProtection = false
