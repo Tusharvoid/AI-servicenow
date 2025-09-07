@@ -275,30 +275,42 @@ def create_ticket_page():
             new_ticket = create_ticket(ticket_data)
             
             if new_ticket:
-                st.success(f"✅ Ticket #{new_ticket['id']} created successfully!")
+                # Handle different possible response structures
+                ticket_id = None
+                if isinstance(new_ticket, dict):
+                    # Try different possible field names for the ticket ID
+                    ticket_id = new_ticket.get('id') or new_ticket.get('ticket_id') or new_ticket.get('number')
                 
-                # Handle file uploads after ticket creation
-                if uploaded_files:
-                    for uploaded_file in uploaded_files:
-                        file_url = upload_file_via_api(uploaded_file.getvalue(), uploaded_file.name, new_ticket['id'])
-                        if file_url:
-                            st.info(f"📎 File '{uploaded_file.name}' uploaded successfully!")
-                
-                # Generate AI reply
-                ai_response = generate_ai_reply(new_ticket['id'], f"New ticket: {title}\n\n{description}")
+                if ticket_id:
+                    st.success(f"✅ Ticket #{ticket_id} created successfully!")
+                    
+                    # Handle file uploads after ticket creation
+                    if uploaded_files:
+                        for uploaded_file in uploaded_files:
+                            file_url = upload_file_via_api(uploaded_file.getvalue(), uploaded_file.name, ticket_id)
+                            if file_url:
+                                st.info(f"📎 File '{uploaded_file.name}' uploaded successfully!")
+                    
+                    # Generate AI reply
+                    ai_response = generate_ai_reply(ticket_id, f"New ticket: {title}\n\n{description}")
+                else:
+                    st.success("✅ Ticket created successfully!")
+                    st.info("Note: Ticket ID not available in response")
+                    # Debug: Show the actual response structure
+                    st.write("API Response:", new_ticket)
                 if ai_response:
                     st.info("🤖 AI assistant has reviewed your ticket!")
                 
                 st.balloons()
                 
                 # Send email notification if email provided
-                if email:
+                if email and ticket_id:
                     email_data = {
                         "to_email": email,
-                        "subject": f"Ticket #{new_ticket['id']} Created Successfully",
-                        "message": f"Your ticket '{title}' has been created and assigned ID #{new_ticket['id']}. We'll get back to you soon!"
+                        "subject": f"Ticket #{ticket_id} Created Successfully",
+                        "message": f"Your ticket '{title}' has been created and assigned ID #{ticket_id}. We'll get back to you soon!"
                     }
-                    if send_email_via_api(new_ticket['id'], email_data):
+                    if send_email_via_api(ticket_id, email_data):
                         st.info("📧 Confirmation email sent!")
 
 def my_tickets_page():
