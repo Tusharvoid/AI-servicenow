@@ -14,7 +14,7 @@ try:
     API_BASE_URL = st.secrets["API_BASE_URL"]
 except (KeyError, FileNotFoundError):
     # Fallback to environment variables for local development
-    API_BASE_URL = os.getenv("API_BASE_URL", "https://ticket-management-api-production-62d3.up.railway.app")
+    API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 
 # Test API connection
 def test_api_connection():
@@ -27,7 +27,8 @@ def test_api_connection():
 # API Helper functions
 def get_all_tickets():
     try:
-        response = requests.get(f"{API_BASE_URL}/tickets/")
+        url = f"{API_BASE_URL}/tickets".rstrip('/')
+        response = requests.get(url)
         if response.status_code == 200:
             return response.json()
         else:
@@ -39,11 +40,14 @@ def get_all_tickets():
 
 def create_ticket(ticket_data):
     try:
-        response = requests.post(f"{API_BASE_URL}/tickets/", json=ticket_data)
+        # Remove trailing slash from the URL
+        url = f"{API_BASE_URL}/tickets".rstrip('/')
+        response = requests.post(url, json=ticket_data)
         if response.status_code in [200, 201]:
             return response.json()
         else:
             st.error(f"Failed to create ticket: {response.status_code}")
+            st.error(f"Response: {response.text}")
             return None
     except Exception as e:
         st.error(f"Error creating ticket: {e}")
@@ -51,7 +55,8 @@ def create_ticket(ticket_data):
 
 def get_ticket_by_id(ticket_id):
     try:
-        response = requests.get(f"{API_BASE_URL}/tickets/{ticket_id}")
+        url = f"{API_BASE_URL}/tickets/{ticket_id}".rstrip('/')
+        response = requests.get(url)
         if response.status_code == 200:
             return response.json()
         else:
@@ -64,7 +69,8 @@ def get_ticket_by_id(ticket_id):
 def upload_file_via_api(file_content, filename, ticket_id):
     try:
         files = {"file": (filename, file_content)}
-        response = requests.post(f"{API_BASE_URL}/tickets/{ticket_id}/attachment", files=files)
+        url = f"{API_BASE_URL}/tickets/{ticket_id}/attachment".rstrip('/')
+        response = requests.post(url, files=files)
         if response.status_code == 200:
             response_data = response.json()
             # Return the signed URL for accessing the file
@@ -86,7 +92,8 @@ def generate_ai_reply(ticket_id, message, image_base64=None, image_filename=None
             payload["image_base64"] = image_base64
             payload["image_filename"] = image_filename
             
-        response = requests.post(f"{API_BASE_URL}/ai/reply", json=payload)
+        url = f"{API_BASE_URL}/ai/reply".rstrip('/')
+        response = requests.post(url, json=payload)
         if response.status_code == 200:
             return response.json()
         else:
@@ -98,7 +105,8 @@ def generate_ai_reply(ticket_id, message, image_base64=None, image_filename=None
 
 def send_email_via_api(ticket_id, email_data):
     try:
-        response = requests.post(f"{API_BASE_URL}/tickets/{ticket_id}/send-email", json=email_data)
+        url = f"{API_BASE_URL}/tickets/{ticket_id}/email".rstrip('/')
+        response = requests.post(url, json=email_data)
         return response.status_code == 200
     except Exception as e:
         st.error(f"Error sending email: {e}")
@@ -106,7 +114,8 @@ def send_email_via_api(ticket_id, email_data):
 
 def add_reply_via_api(ticket_id, reply_data):
     try:
-        response = requests.post(f"{API_BASE_URL}/tickets/{ticket_id}/replies", json=reply_data)
+        url = f"{API_BASE_URL}/tickets/{ticket_id}/replies".rstrip('/')
+        response = requests.post(url, json=reply_data)
         if response.status_code == 200:
             return response.json()
         else:
@@ -118,8 +127,8 @@ def add_reply_via_api(ticket_id, reply_data):
 
 def get_ticket_replies(ticket_id):
     try:
-        # Get the full ticket data which includes replies
-        response = requests.get(f"{API_BASE_URL}/tickets/{ticket_id}")
+        url = f"{API_BASE_URL}/tickets/{ticket_id}/replies".rstrip('/')
+        response = requests.get(url)
         if response.status_code == 200:
             ticket_data = response.json()
             return ticket_data.get('replies', [])
@@ -131,7 +140,8 @@ def get_ticket_replies(ticket_id):
 
 def update_ticket_status(ticket_id, status):
     try:
-        response = requests.patch(f"{API_BASE_URL}/tickets/{ticket_id}/status", json={"status": status})
+        url = f"{API_BASE_URL}/tickets/{ticket_id}/status".rstrip('/')
+        response = requests.patch(url, json={"status": status})
         return response.status_code == 200
     except Exception as e:
         st.error(f"Error updating ticket status: {e}")
